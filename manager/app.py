@@ -6,6 +6,8 @@ from api.agent_routes import agent_bp
 from api.script_routes import script_bp
 from api.result_routes import result_bp
 from api.health_routes import health_bp
+from api.logs_routes import logs_bp
+from api.config_routes import config_bp
 
 # Initialize Migrate after db
 migrate = Migrate()
@@ -21,9 +23,11 @@ def create_app():
     migrate.init_app(app, db)   # <-- This enables 'flask db' commands
 
     # Register blueprints
+    app.register_blueprint(config_bp)
     app.register_blueprint(agent_bp, url_prefix="/api/v1/agent")
     app.register_blueprint(script_bp, url_prefix="/api/v1/script")
     app.register_blueprint(result_bp, url_prefix="/api/v1/result")
+    app.register_blueprint(logs_bp, url_prefix="/api/v1/logs")
     app.register_blueprint(health_bp)
 
     @app.route("/")

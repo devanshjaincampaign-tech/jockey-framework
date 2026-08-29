@@ -3,29 +3,53 @@
 <h2>Forensic Results</h2>
 <table class="table table-striped" id="results-table">
     <thead>
-        <tr><th>Result ID</th><th>Agent</th><th>Script</th><th>Submitted</th><th>Action</th></tr>
+        <tr><th>Result ID</th><th>Agent</th><th>Script</th><th>Output</th><th>Submitted</th><th>Action</th></tr>
     </thead>
     <tbody></tbody>
 </table>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function loadResults() {
     fetch('/api/v1/result/list')
         .then(r => r.json())
         .then(results => {
             const tbody = document.querySelector('#results-table tbody');
+            tbody.innerHTML = '';
+
+            if (!results.length) {
+                tbody.innerHTML = '<tr><td colspan="6">No results yet.</td></tr>';
+                return;
+            }
+
             results.forEach(r => {
                 const tr = document.createElement('tr');
+                const output = escapeHtml(r.data_decrypted || 'No output');
                 tr.innerHTML = `
-                    <td>${r.result_id}</td>
-                    <td>${r.agent_id}</td>
-                    <td>${r.script_id}</td>
+                    <td>${escapeHtml(r.result_id)}</td>
+                    <td>${escapeHtml(r.agent_id)}</td>
+                    <td>${escapeHtml(r.script_id)}</td>
+                    <td style="max-width:420px; white-space:pre-wrap; word-break:break-word;">${output}</td>
                     <td>${new Date(r.submitted_at).toLocaleString()}</td>
-                    <td><a href="/api/v1/result/view?result_id=${r.result_id}" target="_blank">View</a></td>
+                    <td><a href="/api/v1/result/view?result_id=${encodeURIComponent(r.result_id)}" target="_blank">View</a></td>
                 `;
                 tbody.appendChild(tr);
             });
-        });
+        })
+        .catch(err => console.error('Failed to load results', err));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadResults();
+    setInterval(loadResults, 5000);
 });
 </script>
 {% endblock %}

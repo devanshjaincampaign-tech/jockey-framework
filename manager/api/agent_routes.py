@@ -2,6 +2,10 @@ from flask import Blueprint, request, jsonify
 from datetime import datetime
 from models import db, Agent, Deploy, Script
 
+def require_agent_secret(agent: Agent):
+    provided = request.headers.get("X-Agent-Secret") or request.headers.get("X-Agent-Token")
+    return provided == agent.token
+
 agent_bp = Blueprint('agent', __name__, url_prefix='/api/v1/agent')
 
 
@@ -39,9 +43,11 @@ def register_agent():
         agent.os = os_type or agent.os
         agent.ip = ip or agent.ip
         agent.arch = arch or agent.arch
+        if not agent.token:
+            agent.token = Agent._generate_token()
 
     db.session.commit()
-    return jsonify({'status': 'registered', 'agent_id': agent_id}), 200
+    return jsonify({'status': 'registered', 'agent_id': agent_id, 'agent_secret': agent.token}), 200
 
 
 @agent_bp.route('/heartbeat', methods=['POST'])
@@ -61,6 +67,9 @@ def heartbeat():
     agent = Agent.query.get(agent_id)
     if not agent:
         return jsonify({'error': 'Agent not found'}), 404
+
+    if not require_agent_secret(agent):
+        return jsonify({'error': 'Unauthorized'}), 401
 
     agent.last_seen = datetime.utcnow()
     agent.status = 'online'
