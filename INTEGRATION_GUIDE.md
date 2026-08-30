@@ -6,25 +6,25 @@
 ┌─────────────────────────────────────────────────────────┐
 │                  JOCKY Framework                        │
 ├─────────────────────────────────────────────────────────┤
-│                                                          │
-│  ┌──────────────────────┐        ┌──────────────────┐  │
-│  │   Manager Service    │        │  Dashboard UI    │  │
-│  │   (Flask + SQLite)   │◄──────►│  (Real-time)     │  │
-│  │   Port: 5000         │        │  Localhost:5000  │  │
-│  └──────────────────────┘        └──────────────────┘  │
-│           ▲                                              │
+│                                                         │
+│  ┌──────────────────────┐        ┌──────────────────┐   │
+│  │   Manager Service    │        │  Dashboard UI    │   │
+│  │   (Flask + SQLite)   │◄──────►│  (Real-time)     │   │
+│  │   Port: 5000         │        │  Localhost:5000  │   │
+│  └──────────────────────┘        └──────────────────┘   │
+│           ▲                                             │
 │           │ HTTP/JSON                                   │
-│           │                                              │
+│           │                                             │
 │  ┌────────┴───────────────────────────────────────────┐ │
-│  │                                                     │ │
+│  │                                                    │ │
 │  ├─ /api/v1/config/bootstrap    (New agent init)      │ │
 │  ├─ /api/v1/agent/heartbeat     (Status updates)      │ │
 │  ├─ /api/v1/result/submit       (Command results)     │ │
 │  ├─ /api/v1/logs/submit         (Agent logs)          │ │
 │  ├─ /api/v1/script/deploy       (Send commands)       │ │
-│  └─ /                            (Dashboard)           │ │
-│                                                          │
-│  Database: instance/jocky.db (SQLite)                  │
+│  └─ /                            (Dashboard)          │ │
+│                                                         │
+│  Database: instance/jocky.db (SQLite)                   │
 └─────────────────────────────────────────────────────────┘
 
                         Network (HTTP)
